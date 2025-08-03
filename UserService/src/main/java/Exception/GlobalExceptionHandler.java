@@ -29,13 +29,5 @@ public class GlobalExceptionHandler {
 		return ResponseEntity.status(400).body(error);
 	}
 	
-	@ExceptionHandler(Exception.class)
-	public ResponseEntity<UserErrorResponse>OtherExceptin(Exception ex,HttpServletRequest request){
-		
-		UserErrorResponse error = new UserErrorResponse(500, ex.getMessage(), request.getRequestURI());
-		
-		return ResponseEntity.status(500).body(error);
-	}
-	
 	
 }
