@@ -23,6 +23,7 @@ import com.order.OrderService.Dto.User;
 import com.order.OrderService.Repository.OrderRepository;
 import com.order.OrderService.model.Order;
 
+import CustomeException.OrderNotFoundException;
 import ErrorResponseHandle.ErrorResponse;
 
 @RestController
@@ -46,34 +47,9 @@ public class OrderController {
 	}
 	
 	@GetMapping("/{id}")
-	public ResponseEntity<?>getProductByUser(@PathVariable int id){
+	public Order getProductByUser(@PathVariable int id){
 		
-		Optional<Order> orderOpt = orderRepository.findById(id);
-		
-		if(orderOpt.isEmpty()) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND)
-					.body(new ErrorResponse("Order not found for id: "+id,"ORDER_NOT_FOUND"));
-		}
-		
-		Order order = orderOpt.get();
-		
-		try {
-			User user = restTemplate.getForObject(userServiceUrl + "/" + order.getUserId(),User.class);
-		
-			return ResponseEntity.ok(new OrderResponse(order,user));
-		}
-		catch(HttpClientErrorException.NotFound ex) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND)
-					.body(new ErrorResponse("Order not found for id: "+id,"ORDER_NOT_FOUND"));
-		}
-		catch(HttpServerErrorException | ResourceAccessException ex) {
-			return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
-					.body(new ErrorResponse("User service is unaivalable ", "USER_SERVICE_ERROR"));
-		}
-		catch(Exception ex) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-					.body(new ErrorResponse("Interval server error", "INTERNAL_ERROR"));
-		}
+		return orderRepository.findById(id).orElseThrow(() -> new OrderNotFoundException("Order is found by :"+id));
 		
 	}
 	
