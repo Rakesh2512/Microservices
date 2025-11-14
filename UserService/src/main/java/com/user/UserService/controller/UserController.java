@@ -14,6 +14,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.user.UserService.model.User;
 import com.user.UserService.repository.UserRepository;
 
+import Exception.UserNotFoundException;
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/users")
 public class UserController {
@@ -22,16 +25,18 @@ public class UserController {
 	public UserRepository userRepository;
 	
 	@PostMapping("/addUsers")
-	public User addUser(@RequestBody User user) {
+	public User addUser(@Valid @RequestBody User user) {
+		
 		return userRepository.save(user);
 	}
 	
 	@GetMapping("/{id}")
 	public User getUsetById(@PathVariable("id") int id) {
 		
-		return userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not Found"));
+		return userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User not found with id :"+id));
 	}
-	
+															 
+
 	@GetMapping("/getAllDetailsList")
 	public List<User>getAllUsers(){
 		return userRepository.findAll();
